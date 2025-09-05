@@ -1,16 +1,14 @@
-import { retrieveLaunchParams } from '@telegram-apps/sdk';
-import { WebAppUser } from '@twa-dev/types'
 import { App } from '../app'
 import { Errors, throwError } from '../errors'
 import { generateUUID } from '../utils/generateUUID';
+import { retrieveLaunchParams  } from "../utils/retrieveLaunchParams";
+import { WebAppUser } from "../../declaration";
 
 export class SessionController {
     private sessionId: string;
-    private userId: number;
     private userData: WebAppUser;
     private platform: string;
     private webAppStartParam: string;
-    private userLocale: string;
 
     private appModule: App;
 
@@ -20,25 +18,15 @@ export class SessionController {
 
     public init() {
         const lp = retrieveLaunchParams();
-        const initData = lp.initData;
-        const user = lp.initData?.user;
-        if (!user) {
+        const initData = lp.tgWebAppData;
+
+        this.userData = initData?.user;
+
+        if (!this.userData) {
             throwError(Errors.USER_DATA_IS_NOT_PROVIDED);
         }
 
-        this.userData = {
-            id: user.id,
-            is_premium: user.isPremium,
-            first_name: user.firstName,
-            is_bot: user.isBot,
-            last_name: user.lastName,
-            language_code: user.languageCode,
-            photo_url: user.photoUrl,
-            username: user.username,
-        };
-        this.userId = user.id;
-        this.userLocale = user.languageCode;
-        this.webAppStartParam = initData.startParam;
+        this.webAppStartParam = initData.start_param;
         this.platform = lp.platform;
         this.sessionId = generateUUID(String(this.getUserId()));
     }
@@ -48,7 +36,7 @@ export class SessionController {
     }
 
     public getUserId() {
-        return this.userId;
+        return this.userData.id;
     }
 
     public getWebAppStartParam() {
@@ -60,7 +48,7 @@ export class SessionController {
     }
 
     public getUserLocale() {
-        return this.userLocale;
+        return this.userData.language_code;
     }
 
     public getUserData() {
