@@ -3,7 +3,7 @@ import { NetworkController } from './controllers/Network.controller'
 import { SessionController } from './controllers/Session.controller'
 import { BatchService } from "./services/Batch.service";
 import { HumanProofService } from "./services/HumanProof.service";
-import {InvoicePayload} from "./declarations/invoice-payload.interface";
+import {InvoicePayload} from "../declaration";
 import {Events} from "./constants";
 
 export class App {
@@ -16,8 +16,8 @@ export class App {
     private readonly apiToken: string;
     private readonly appName: string;
 
-    public taskParams: string;
-    public taskSolution: string | undefined;
+    public taskParams: string | undefined | null = null;
+
     public env: 'STG' | 'PROD';
 
     constructor(apiToken: string, appName: string, env: 'STG' | 'PROD') {
@@ -35,9 +35,7 @@ export class App {
     public async init() {
         this.sessionController.init();
         await this.analyticsController.init();
-        await this.humanProofService.init().then(() => {
-            this.solveTask();
-        }).catch(e => console.error(e));
+        await this.humanProofService.init().catch(e => console.error(e));
         this.networkController.init();
         this.batchService.init();
     }
@@ -82,11 +80,11 @@ export class App {
         return this.appName;
     }
 
-    public solveTask() {
-        this.humanProofService.solveTask();
-    }
+    public async solveHumanProofTask(): Promise<string | undefined> {
+        if (this.taskParams === null) {
+            this.taskParams = await this.humanProofService.getInitialParams().catch(_err => undefined);
+        }
 
-    public setNewArgs(data: string) {
-        this.humanProofService.setNewArgs(data);
+        return await this.humanProofService.solveTask(this.taskParams).catch(_err => undefined);
     }
 }

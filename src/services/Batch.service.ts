@@ -19,40 +19,19 @@ export class BatchService {
 
     public init() {
         if (document.readyState === 'complete') {
-            this.startBatchingWithInterval();
+            this.startBatching();
         } else {
             document.onreadystatechange = () => {
                 if (document.readyState == "complete") {
-                    this.startBatchingWithInterval();
+                    this.startBatching();
                 }
             }
         }
     }
 
-    private startBatchingWithInterval() {
-        let counter = 0;
-        this.appModule.solveTask();
+    private startBatching() {
         this.appModule.collectEvent(Events.INIT);
-
-        if (this.appModule.taskSolution !== undefined) {
-            this.startBatching();
-        } else {
-            const intervalId = setInterval(() => {
-                if (this.appModule.taskSolution !== undefined) {
-                    this.startBatching();
-                    clearInterval(intervalId);
-                } else {
-                    if (counter++ >= 3) {
-                        this.startBatching()
-                        clearInterval(intervalId);
-
-                        return;
-                    }
-
-                    this.appModule.solveTask();
-                }
-            }, 1000);
-        }
+        this.enableBatching();
     }
 
     public stopBatching() {
@@ -80,8 +59,7 @@ export class BatchService {
         }
     }
 
-    public startBatching() {
-        this.appModule.solveTask();
+    public enableBatching() {
         if (this.intervalId === null) {
             this.intervalId = window.setInterval(() => this.processQueue(), this.batchInterval);
         }
@@ -99,7 +77,7 @@ export class BatchService {
         this.stopBatching();
         this.appModule.recordEvents(batch).then((res: Response)=> {
             if (String(res.status) === '429') {
-                this.startBatching();
+                this.enableBatching();
 
                 return;
             }
@@ -112,7 +90,7 @@ export class BatchService {
                 if (this.backoff < 5){
                     this.backoff++;
                     this.batchInterval = this.batchInterval * 2.71;
-                    this.startBatching();
+                    this.enableBatching();
                 }
                 return;
             }
@@ -126,12 +104,12 @@ export class BatchService {
                 this.appModule.taskSolution = undefined;
 
                 if (this.taskRetry > 3) {
-                    this.startBatching();
+                    this.enableBatching();
 
                     return;
                 } else {
                     this.appModule.solveTask();
-                    this.startBatching();
+                    this.enableBatching();
 
                     return;
                 }
@@ -143,10 +121,10 @@ export class BatchService {
                     !batch.some(event =>
                         JSON.stringify(cachedEvent) === JSON.stringify(event)))
             );
-            this.startBatching();
+            this.enableBatching();
         }, (error) => {
             console.log(error);
-            this.startBatching();
+            this.enableBatching();
         });
     }
 }

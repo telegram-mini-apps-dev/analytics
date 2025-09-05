@@ -45,10 +45,6 @@ export class AnalyticsController {
         }
     }
 
-    public recordEvent(event_name: string, data?: Record<string, any>) {
-        this.appModule.recordEvent(event_name, data).catch(e => console.error(e));
-    }
-
     public collectEvent(event_name: string, data?: Record<string, any>) {
         if (this.eventsThreshold[event_name] === 0) {
             return;

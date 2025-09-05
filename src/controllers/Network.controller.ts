@@ -32,13 +32,12 @@ export class NetworkController {
         return res;
     }
 
-    private readonly generateHeaders = (compressed: boolean) => {
-        this.appModule.solveTask();
-
+    private readonly generateHeaders = async (compressed: boolean) => {
         const conditionHeaders = {};
+        const solution: string | undefined = await this.appModule.solveHumanProofTask();
 
-        if (this.appModule.taskSolution) {
-            conditionHeaders["Content"] = this.appModule.taskSolution;
+        if (solution) {
+            conditionHeaders["Content"] = solution;
         }
 
         if (compressed) {
@@ -58,36 +57,8 @@ export class NetworkController {
     ) {
         return await fetch(this.BACKEND_URL + 'events',{
             method: 'POST',
-            headers: this.generateHeaders(compressed),
+            headers: await this.generateHeaders(compressed),
             body: compressed ? await compressData(data) : JSON.stringify(data),
-        }).then(this.responseToParams, this.responseToParams);
-    }
-
-    public async recordEvent(
-        event_name: string,
-        data?: Record<string, any>,
-        attributes?: Record<string, any>,
-        compressed: boolean = true,
-    ) {
-        if (data?.custom_data) {
-            if (!attributes) {
-                attributes = data.custom_data;
-            } else {
-                attributes = Object.assign(data.custom_data, attributes);
-            }
-        }
-
-        const body = {
-            ...data,
-            event_name: event_name,
-            custom_data: attributes,
-            ...this.appModule.assembleEventSession(),
-        };
-
-        await fetch(this.BACKEND_URL + 'events',{
-            method: 'POST',
-            headers: this.generateHeaders(true),
-            body: compressed ? await compressData(body) : JSON.stringify(body),
         }).then(this.responseToParams, this.responseToParams);
     }
 }
