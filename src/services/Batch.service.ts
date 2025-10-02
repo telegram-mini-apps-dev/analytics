@@ -8,7 +8,6 @@ export class BatchService {
     private backoff: number = 1;
     private intervalId: number | null = null;
     private batchInterval: number = 2000;
-    private taskRetry: number = 0;
 
     private readonly BATCH_KEY: string = BATCH_KEY;
 
@@ -30,29 +29,8 @@ export class BatchService {
     }
 
     private startBatchingWithInterval() {
-        let counter = 0;
-        this.appModule.solveTask();
         this.appModule.collectEvent(Events.INIT);
-
-        if (this.appModule.taskSolution !== undefined) {
-            this.startBatching();
-        } else {
-            const intervalId = setInterval(() => {
-                if (this.appModule.taskSolution !== undefined) {
-                    this.startBatching();
-                    clearInterval(intervalId);
-                } else {
-                    if (counter++ >= 3) {
-                        this.startBatching()
-                        clearInterval(intervalId);
-
-                        return;
-                    }
-
-                    this.appModule.solveTask();
-                }
-            }, 1000);
-        }
+        this.startBatching();
     }
 
     public stopBatching() {
@@ -81,7 +59,6 @@ export class BatchService {
     }
 
     public startBatching() {
-        this.appModule.solveTask();
         if (this.intervalId === null) {
             this.intervalId = window.setInterval(() => this.processQueue(), this.batchInterval);
         }
@@ -120,29 +97,12 @@ export class BatchService {
             this.backoff = 1;
             this.batchInterval = 2000;
 
-            if (String(res.status) === '203') {
-                this.taskRetry++;
-
-                this.appModule.taskSolution = undefined;
-
-                if (this.taskRetry > 3) {
-                    this.startBatching();
-
-                    return;
-                } else {
-                    this.appModule.solveTask();
-                    this.startBatching();
-
-                    return;
-                }
-            }
-
-            this.taskRetry = 0;
             this.storage.setItem(this.storage.getBatch()
                 .filter(cachedEvent =>
                     !batch.some(event =>
                         JSON.stringify(cachedEvent) === JSON.stringify(event)))
             );
+
             this.startBatching();
         }, (error) => {
             console.log(error);
