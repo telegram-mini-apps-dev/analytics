@@ -1,8 +1,8 @@
 import { App } from '../app'
 import { TonConnectObserver } from "../observers/TonConnect.observer";
 import { DocumentObserver } from "../observers/Document.observer";
-import {BACKEND_URL, STAGING_BACKEND_URL} from "../constants";
-import {WebViewObserver} from "../observers/WebView.observer";
+import { BACKEND_URL, STAGING_BACKEND_URL } from "../constants";
+import { WebViewObserver } from "../observers/WebView.observer";
 
 export class AnalyticsController {
     private appModule: App;
