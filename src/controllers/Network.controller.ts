@@ -28,10 +28,6 @@ export class NetworkController {
     private readonly generateHeaders = (compressed: boolean) => {
         const conditionHeaders = {};
 
-        if (this.appModule.taskSolution) {
-            conditionHeaders["Content"] = this.appModule.taskSolution;
-        }
-
         if (compressed) {
             conditionHeaders['Content-Encoding'] = 'gzip';
         }

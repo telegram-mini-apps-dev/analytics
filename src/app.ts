@@ -14,7 +14,6 @@ export class App {
     private readonly apiToken: string;
     private readonly appName: string;
 
-    public taskSolution: string | undefined;
     public env: 'STG' | 'PROD';
 
     constructor(apiToken: string, appName: string, env: 'STG' | 'PROD') {
