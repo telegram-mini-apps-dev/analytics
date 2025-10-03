@@ -22,24 +22,11 @@ export class NetworkController {
     public init() {}
 
     private readonly responseToParams = async (res: Response)=> {
-        const response: Response = res.clone();
-        if ((String(response.status)[0] === '2') || (response.status === 429)) {
-            const data = await response.json();
-
-            this.appModule.setNewArgs(data['Content']);
-        }
-
         return res;
     }
 
     private readonly generateHeaders = (compressed: boolean) => {
-        this.appModule.solveTask();
-
         const conditionHeaders = {};
-
-        if (this.appModule.taskSolution) {
-            conditionHeaders["Content"] = this.appModule.taskSolution;
-        }
 
         if (compressed) {
             conditionHeaders['Content-Encoding'] = 'gzip';
