@@ -1,5 +1,7 @@
 import { App } from './app'
 import { InvoicePayload } from "./declarations/invoice-payload.interface";
+import { AnalyticsEvent, BatchedAnalyticsEvent } from "./declarations/analytics-event.interface";
+import { InnerworksSessionService } from "./services/InnerworksSession.service";
 import {validateInvoicePayload} from "./validators/invoice-payload.validator";
 
 let __registerInvoice: (invoicePayload: InvoicePayload) => void;
@@ -23,3 +25,8 @@ export default {
     init,
     registerInvoice: (invoicePayload: InvoicePayload) => __registerInvoice(invoicePayload),
 };
+
+export { App };
+export { InvoicePayload };
+export { AnalyticsEvent, BatchedAnalyticsEvent };
+export { InnerworksSessionService };

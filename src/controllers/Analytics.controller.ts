@@ -41,16 +41,16 @@ export class AnalyticsController {
         }
     }
 
-    public recordEvent(event_name: string, data?: Record<string, any>) {
-        this.appModule.recordEvent(event_name, data).catch(e => console.error(e));
+    public recordEvent(event_name: string, data?: Record<string, any>, userId?: string) {
+        this.appModule.recordEvent(event_name, data, undefined, userId).catch(e => console.error(e));
     }
 
-    public collectEvent(event_name: string, data?: Record<string, any>) {
+    public async collectEvent(event_name: string, data?: Record<string, any>, userId?: string) {
         if (this.eventsThreshold[event_name] === 0) {
             return;
         }
 
-        this.appModule.collectEvent(event_name, data);
+        await this.appModule.collectEvent(event_name, data, userId);
 
         if (this.eventsThreshold[event_name]) {
             this.eventsThreshold[event_name]--;
