@@ -43,7 +43,6 @@ export class BatchStorage {
     }
 
     public clearStorage() {
-        this.localStorage.removeItem(this.key);
-        this.sessionStorage.removeItem(this.key);
+        this.setItem([]);
     }
 }

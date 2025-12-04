@@ -1,6 +1,7 @@
 import {BATCH_KEY, Events} from "../constants";
 import { App } from "../app";
 import { BatchStorage } from "../repositories/BatchStorage";
+import { checkAuthError } from "../utils/checkAuthError";
 
 export class BatchService {
     private appModule: App;
@@ -76,31 +77,11 @@ export class BatchService {
         }
     }
 
-    private async checkAuthError(res: Response): Promise<boolean> {
-        if (res.status === 400 || res.status === 403) {
-            try {
-                const responseText = await res.clone().text();
-                const responseData = responseText ? JSON.parse(responseText) : {};
-                const errorMessage = responseData.message || responseData.error || responseText || '';
-                const errorMessageLower = errorMessage.toLowerCase();
-                
-                if (errorMessageLower.includes('invalid app_name') || 
-                    errorMessageLower.includes('the domain name does not match')) {
-                    return true;
-                }
-            } catch (e) {
-                // Ignore parsing errors
-            }
-        }
-        return false;
-    }
-
     private sendBatch(batch: Record<string, any>[]) {
         this.stopBatching();
         this.appModule.recordEvents(batch).then(async (res: Response)=> {
-            const isAuthError = await this.checkAuthError(res);
-            if (isAuthError) {
-                this.storage.clearStorage();
+            if (await checkAuthError(res)) {
+                this.storage.setItem([]);
                 this.stopBatching();
                 return;
             }
