@@ -41,4 +41,9 @@ export class BatchStorage {
         this.localStorage.setItem(this.key, JSON.stringify(value));
         this.sessionStorage.setItem(this.key, JSON.stringify(value));
     }
+
+    public clearStorage() {
+        this.localStorage.removeItem(this.key);
+        this.sessionStorage.removeItem(this.key);
+    }
 }

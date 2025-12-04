@@ -21,7 +21,30 @@ export class NetworkController {
 
     public init() {}
 
+    private async checkAuthError(res: Response): Promise<boolean> {
+        if (res.status === 400 || res.status === 403) {
+            try {
+                const responseText = await res.clone().text();
+                const responseData = responseText ? JSON.parse(responseText) : {};
+                const errorMessage = responseData.message || responseData.error || responseText || '';
+                const errorMessageLower = errorMessage.toLowerCase();
+                
+                if (errorMessageLower.includes('invalid app_name') || 
+                    errorMessageLower.includes('the domain name does not match')) {
+                    return true;
+                }
+            } catch (e) {
+                // Ignore parsing errors
+            }
+        }
+        return false;
+    }
+
     private readonly responseToParams = async (res: Response)=> {
+        const isAuthError = await this.checkAuthError(res);
+        if (isAuthError) {
+            this.appModule.clearStorage();
+        }
         return res;
     }
 

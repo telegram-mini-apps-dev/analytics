@@ -64,6 +64,10 @@ export class BatchService {
         }
     }
 
+    public clearStorage() {
+        this.storage.clearStorage();
+    }
+
     private processQueue() {
         const data: Record<string, any>[] = this.storage.getBatch();
 
@@ -72,9 +76,35 @@ export class BatchService {
         }
     }
 
+    private async checkAuthError(res: Response): Promise<boolean> {
+        if (res.status === 400 || res.status === 403) {
+            try {
+                const responseText = await res.clone().text();
+                const responseData = responseText ? JSON.parse(responseText) : {};
+                const errorMessage = responseData.message || responseData.error || responseText || '';
+                const errorMessageLower = errorMessage.toLowerCase();
+                
+                if (errorMessageLower.includes('invalid app_name') || 
+                    errorMessageLower.includes('the domain name does not match')) {
+                    return true;
+                }
+            } catch (e) {
+                // Ignore parsing errors
+            }
+        }
+        return false;
+    }
+
     private sendBatch(batch: Record<string, any>[]) {
         this.stopBatching();
-        this.appModule.recordEvents(batch).then((res: Response)=> {
+        this.appModule.recordEvents(batch).then(async (res: Response)=> {
+            const isAuthError = await this.checkAuthError(res);
+            if (isAuthError) {
+                this.storage.clearStorage();
+                this.stopBatching();
+                return;
+            }
+
             if (String(res.status) === '429') {
                 this.startBatching();
 
