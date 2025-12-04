@@ -2,7 +2,6 @@ import { App } from '../app'
 import { BACKEND_URL, STAGING_BACKEND_URL } from '../constants'
 import { Errors, throwError } from '../errors'
 import { compressData } from '../utils/compress';
-import { checkAuthError } from '../utils/checkAuthError';
 
 export class NetworkController {
     private appModule: App;
@@ -23,9 +22,6 @@ export class NetworkController {
     public init() {}
 
     private readonly responseToParams = async (res: Response)=> {
-        if (await checkAuthError(res)) {
-            this.appModule.clearStorage();
-        }
         return res;
     }
 

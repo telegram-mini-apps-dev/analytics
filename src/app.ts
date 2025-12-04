@@ -73,8 +73,4 @@ export class App {
     public getAppName() {
         return this.appName;
     }
-
-    public clearStorage() {
-        this.batchService.clearStorage();
-    }
 }
