@@ -1,7 +1,6 @@
 import {BATCH_KEY, Events} from "../constants";
 import { App } from "../app";
 import { BatchStorage } from "../repositories/BatchStorage";
-import { checkAuthError } from "../utils/checkAuthError";
 
 export class BatchService {
     private appModule: App;
@@ -14,7 +13,7 @@ export class BatchService {
 
     constructor(appModule: App) {
         this.appModule = appModule;
-        this.storage = new BatchStorage(this.BATCH_KEY + '-' + this.appModule.getApiToken());
+        this.storage = new BatchStorage(this.BATCH_KEY + '-' + this.appModule.getApiToken() + '-' + this.appModule.getAppName());
     }
 
     public init() {
@@ -65,10 +64,6 @@ export class BatchService {
         }
     }
 
-    public clearStorage() {
-        this.storage.clearStorage();
-    }
-
     private processQueue() {
         const data: Record<string, any>[] = this.storage.getBatch();
 
@@ -79,13 +74,7 @@ export class BatchService {
 
     private sendBatch(batch: Record<string, any>[]) {
         this.stopBatching();
-        this.appModule.recordEvents(batch).then(async (res: Response)=> {
-            if (await checkAuthError(res)) {
-                this.storage.setItem([]);
-                this.stopBatching();
-                return;
-            }
-
+        this.appModule.recordEvents(batch).then((res: Response)=> {
             if (String(res.status) === '429') {
                 this.startBatching();
 
