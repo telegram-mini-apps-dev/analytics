@@ -6,7 +6,7 @@ Telegram Analytics is a powerful SDK and API that enables your mini-application 
 
 ### ⚠️ **Disclaimer**
 
-> The library does not collect or store any private user data. It tracks app launches, TON Connect interactions, and GDPR-compliant events in an anonymous format. This data is used solely for to rank applications in the catalog based on their performance and Streaks.
+> The library tracks app launches and TON Connect interactions. This data is used solely for to rank applications in the catalog based on their performance and Streaks.
 
 ## 🖥️ Environment Support
 
