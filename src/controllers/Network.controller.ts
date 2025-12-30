@@ -77,4 +77,15 @@ export class NetworkController {
             body: compressed ? await compressData(body) : JSON.stringify(body),
         }).then(this.responseToParams, this.responseToParams);
     }
+
+    public async recordFingerprint(wallet_address: string, request_id: string) {
+        fetch(this.BACKEND_URL + 'events/fingerprint', {
+            method: 'POST',
+            headers: this.generateHeaders(false),
+            body: JSON.stringify({
+                wallet_address: wallet_address,
+                request_id: request_id,
+            }),
+        }).then(this.responseToParams, this.responseToParams);
+    }
 }

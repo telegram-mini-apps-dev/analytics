@@ -4,12 +4,15 @@ import { SessionController } from './controllers/Session.controller'
 import { BatchService } from './services/Batch.service';
 import {InvoicePayload} from './declarations/invoice-payload.interface';
 import {Events} from './constants';
+import { InnerworksMetrics } from "@innerworks-me/iw-auth-sdk";
+import { ConnectionCompletedEvent } from "@tonconnect/ui";
 
 export class App {
     private sessionController: SessionController;
     private networkController: NetworkController;
     private analyticsController: AnalyticsController;
     private batchService: BatchService;
+    private innerworksMetrics: InnerworksMetrics;
 
     private readonly apiToken: string;
     private readonly appName: string;
@@ -25,6 +28,9 @@ export class App {
         this.networkController = new NetworkController(this);
         this.analyticsController = new AnalyticsController(this);
         this.batchService = new BatchService(this);
+        this.innerworksMetrics = new InnerworksMetrics({
+            appId: '89ee9d10-759b-49c1-84c6-3bcbd564de4b',
+        });
     }
 
     public async init() {
@@ -32,6 +38,15 @@ export class App {
         await this.analyticsController.init();
         this.networkController.init();
         this.batchService.init();
+        window.addEventListener(
+            'ton-connect-connection-completed',
+            async (event: CustomEvent<ConnectionCompletedEvent>) => {
+                const resp = await this.innerworksMetrics.sendMetrics(event.detail.wallet_address);
+                if (resp.result === 'success') {
+                    this.networkController.recordFingerprint(event.detail.wallet_address, resp.requestId);
+                };
+            }
+        );
     }
 
     public assembleEventSession() {

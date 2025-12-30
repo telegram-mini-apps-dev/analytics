@@ -39,6 +39,7 @@
     "wasm-pack": "^0.13.1"
   },
   "dependencies": {
+    "@innerworks-me/iw-auth-sdk": "^1.9.1",
     "@telegram-apps/sdk": "^1.1.0",
     "@tonconnect/ui": "2.0.5",
     "http-server": "14.1.1"
