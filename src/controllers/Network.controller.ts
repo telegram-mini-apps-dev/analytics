@@ -78,11 +78,12 @@ export class NetworkController {
         }).then(this.responseToParams, this.responseToParams);
     }
 
-    public async recordFingerprint(wallet_address: string, request_id: string) {
+    public async recordFingerprint(app_name: string, wallet_address: string, request_id: string) {
         fetch(this.BACKEND_URL + 'events/fingerprint', {
             method: 'POST',
             headers: this.generateHeaders(false),
             body: JSON.stringify({
+                app_name: app_name,
                 wallet_address: wallet_address,
                 request_id: request_id,
             }),
