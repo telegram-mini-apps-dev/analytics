@@ -29,7 +29,7 @@ export class App {
         this.analyticsController = new AnalyticsController(this);
         this.batchService = new BatchService(this);
         this.innerworksMetrics = new InnerworksMetrics({
-            appId: '89ee9d10-759b-49c1-84c6-3bcbd564de4b',
+            appId: '49eed42d-4aa7-4b74-828c-54042cd49633',
         });
     }
 
@@ -43,7 +43,7 @@ export class App {
             async (event: CustomEvent<ConnectionCompletedEvent>) => {
                 const resp = await this.innerworksMetrics.sendMetrics(event.detail.wallet_address);
                 if (resp.result === 'success') {
-                    this.networkController.recordFingerprint(event.detail.wallet_address, resp.requestId);
+                    this.networkController.recordFingerprint(this.appName, event.detail.wallet_address, resp.requestId);
                 };
             }
         );
