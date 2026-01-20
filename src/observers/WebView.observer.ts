@@ -94,7 +94,7 @@ export class WebViewObserver {
             window.TelegramWebviewProxy.postEvent(eventType, JSON.stringify(eventData));
             callback();
         }
-        else if (window.external && 'notify' in window.external) {
+        else if (window.external && 'notify' in window.external && typeof window.external.notify === 'function') {
             window.external.notify(JSON.stringify({eventType: eventType, eventData: eventData}));
             callback();
         }

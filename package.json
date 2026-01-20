@@ -1,6 +1,6 @@
 {
   "name": "@telegram-apps/analytics",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@innerworks-me/iw-auth-sdk": "^1.9.1",
-    "@telegram-apps/sdk": "^1.1.0",
+    "@telegram-apps/sdk": "^3.9.2",
     "@tonconnect/ui": "2.0.5",
     "http-server": "14.1.1"
   },
