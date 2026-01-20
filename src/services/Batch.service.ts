@@ -13,7 +13,7 @@ export class BatchService {
 
     constructor(appModule: App) {
         this.appModule = appModule;
-        this.storage = new BatchStorage(this.BATCH_KEY + '-' + this.appModule.getApiToken());
+        this.storage = new BatchStorage(this.BATCH_KEY + '-' + this.appModule.getApiToken() + '-' + this.appModule.getAppName());
     }
 
     public init() {
