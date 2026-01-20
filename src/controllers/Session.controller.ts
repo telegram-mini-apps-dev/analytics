@@ -1,4 +1,4 @@
-import { retrieveLaunchParams } from '@telegram-apps/sdk';
+import { retrieveLaunchParams, type RetrieveLPResultCamelCased } from '@telegram-apps/sdk';
 import { WebAppUser } from '@twa-dev/types'
 import { App } from '../app'
 import { Errors, throwError } from '../errors'
@@ -19,9 +19,9 @@ export class SessionController {
     }
 
     public init() {
-        const lp = retrieveLaunchParams();
-        const initData = lp.initData;
-        const user = lp.initData?.user;
+        const lp = retrieveLaunchParams(true) as RetrieveLPResultCamelCased;
+        const initData = lp.tgWebAppData;
+        const user = initData?.user;
         if (!user) {
             throwError(Errors.USER_DATA_IS_NOT_PROVIDED);
         }
@@ -38,8 +38,8 @@ export class SessionController {
         };
         this.userId = user.id;
         this.userLocale = user.languageCode;
-        this.webAppStartParam = initData.startParam;
-        this.platform = lp.platform;
+        this.webAppStartParam = initData?.startParam ?? '';
+        this.platform = lp.tgWebAppPlatform;
         this.sessionId = generateUUID(String(this.getUserId()));
     }
 
